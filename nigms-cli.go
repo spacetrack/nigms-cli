@@ -3,6 +3,9 @@
  *
  * ... allows quick posting to the NIGMS tumblr
  *
+ * $ cd src/github.com/spacetrack/nigms-cli
+ * $ go run *.go help
+ *
  */
 
 package main
@@ -17,6 +20,8 @@ import (
     "strings"
 
     "github.com/kurrik/oauth1a"
+
+    "gopkg.in/yaml.v2"
 )
 
 func doApiRequest(method string, url string, values url.Values) ([]byte, error) {
@@ -87,15 +92,28 @@ func main() {
 
     // create a new post
     case "new", "create":
+        contents, err := ioutil.ReadFile("post.yaml")
+
+        if err != nil {
+            fmt.Println(err)
+            os.Exit(1)
+        }
+
+        p := Post{}
+        err = yaml.Unmarshal([]byte(contents), &p)
+
+        fmt.Println(p)
+        //os.Exit(1)
+
         requestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/post"
         values := url.Values{}
 
         values.Set("type", "text")
-        values.Set("state", "draft")
-        values.Set("title", "(test api) Kein Schnee in Gröbenzell ...")
-        values.Set("body", "... mit 4°C nicht gerade winterlich, trotzdem unangenehm nass-kalt.")
-        values.Set("tags", "keinschnee,201601,gröbenzell")
-        values.Set("date", "20160102T10:59:59")
+        values.Set("state", "draft") // "draft", "published"
+        values.Set("title", "Kein Schnee in Gilching ...")
+        values.Set("body", "... wieder 4°C, meist bewölkt.")
+        values.Set("tags", "keinschnee,201601,gilching,ingress")
+        values.Set("date", "20160106T20:05:00")
 
         httpContents, err := doApiRequest("POST", requestURL, values)
 
