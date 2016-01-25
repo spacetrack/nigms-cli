@@ -8,20 +8,21 @@
 package main
 
 import (
-    "net/url"
+	"net/url"
 	"strings"
 	"time"
+
+	//"fmt"
 )
 
 type Post struct {
-	Id       string   `yaml: "id"`
-	Type     string   `yaml: "type"`
-	Status   string   `yaml: "status"` // draft, published
-	Title    string   `yaml: "title"`
-	Body     string   `yaml: "body"`
-	Tags     []string `yaml: "tags"`
-	time_str string   `yaml: time`
-	Time     time.Time
+	Id     string    `yaml: "id"`
+	Type   string    `yaml: "type"`
+	Status string    `yaml: "status"` // draft, published
+	Title  string    `yaml: "title"`
+	Body   string    `yaml: "body"`
+	Tags   []string  `yaml: "tags"`
+	Time   time.Time `yaml: "time"`
 }
 
 func (p *Post) GetTumblrApiValues() url.Values {
@@ -36,7 +37,7 @@ func (p *Post) GetTumblrApiValues() url.Values {
 	values.Set("title", p.Title)
 	values.Set("body", p.Body)
 	values.Set("tags", strings.Join(p.Tags, ","))
-	values.Set("date", p.time_str)
+	values.Set("date", p.Time.Format("2006-01-02T15:04:05"))
 
 	return values
 }

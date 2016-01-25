@@ -11,183 +11,184 @@
 package main
 
 import (
-    // "encoding/json"
-    "fmt"
-    "io/ioutil"
-    "net/http"
-    "net/url"
-    "os"
-    "strings"
+	// "encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
 
-    "github.com/kurrik/oauth1a"
+	"github.com/kurrik/oauth1a"
 
-    "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 )
 
 func doApiRequest(method string, url string, values url.Values) ([]byte, error) {
-    contents, err := ioutil.ReadFile("CREDENTIALS")
+	contents, err := ioutil.ReadFile("CREDENTIALS")
 
-    if err != nil {
-        fmt.Println(err)
-        os.Exit(1)
-    }
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
-    lines := strings.Split(string(contents), "\n")
+	lines := strings.Split(string(contents), "\n")
 
-    service := &oauth1a.Service{
-        RequestURL:   "https://www.tumblr.com/oauth/request_token",
-        AuthorizeURL: "https://www.tumblr.com/oauth/authorize",
-        AccessURL:    "https://www.tumblr.com/oauth/access_token",
+	service := &oauth1a.Service{
+		RequestURL:   "https://www.tumblr.com/oauth/request_token",
+		AuthorizeURL: "https://www.tumblr.com/oauth/authorize",
+		AccessURL:    "https://www.tumblr.com/oauth/access_token",
 
-        ClientConfig: &oauth1a.ClientConfig{
-            ConsumerKey:    lines[0],
-            ConsumerSecret: lines[1],
-            CallbackURL:    "",
-        },
+		ClientConfig: &oauth1a.ClientConfig{
+			ConsumerKey:    lines[0],
+			ConsumerSecret: lines[1],
+			CallbackURL:    "",
+		},
 
-        Signer: new(oauth1a.HmacSha1Signer),
-    }
+		Signer: new(oauth1a.HmacSha1Signer),
+	}
 
-    httpClient := new(http.Client)
-    //userConfig := &oauth1a.UserConfig{}
-    //userConfig.GetRequestToken(service, httpClient)
-    //url, err := userConfig.GetAuthorizeURL(service)
+	httpClient := new(http.Client)
+	//userConfig := &oauth1a.UserConfig{}
+	//userConfig.GetRequestToken(service, httpClient)
+	//url, err := userConfig.GetAuthorizeURL(service)
 
-    userConfig := oauth1a.NewAuthorizedConfig(lines[2], lines[3])
+	userConfig := oauth1a.NewAuthorizedConfig(lines[2], lines[3])
 
-    httpRequest, err := http.NewRequest(method, url, strings.NewReader(values.Encode()))
+	httpRequest, err := http.NewRequest(method, url, strings.NewReader(values.Encode()))
 
-    if err != nil {
-        fmt.Println("ERROR: %s", err)
-        os.Exit(1)
-    }
+	if err != nil {
+		fmt.Println("ERROR: %s", err)
+		os.Exit(1)
+	}
 
-    httpRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-    service.Sign(httpRequest, userConfig)
-    httpResponse, err := httpClient.Do(httpRequest)
+	httpRequest.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	service.Sign(httpRequest, userConfig)
+	httpResponse, err := httpClient.Do(httpRequest)
 
-    if err != nil {
-        fmt.Println("ERROR: %s", err)
-        os.Exit(1)
-    }
+	if err != nil {
+		fmt.Println("ERROR: %s", err)
+		os.Exit(1)
+	}
 
-    defer httpResponse.Body.Close()
+	defer httpResponse.Body.Close()
 
-    return ioutil.ReadAll(httpResponse.Body)
+	return ioutil.ReadAll(httpResponse.Body)
 }
 
 func main() {
-    if len(os.Args) < 2 {
-        fmt.Println("ERROR: please provide a command! Run \"nigms-cli help\" for getting list of commands")
-        os.Exit(1)
-    }
+	if len(os.Args) < 2 {
+		fmt.Println("ERROR: please provide a command! Run \"nigms-cli help\" for getting list of commands")
+		os.Exit(1)
+	}
 
-    switch os.Args[1] {
-    // help
-    case "?", "-?", "-h", "--help", "help":
-        fmt.Println("nigms-cli - nun-ist-genug-mit-schnee command line interface")
-        fmt.Println("command: " + os.Args[1])
+	switch os.Args[1] {
+	// help
+	case "?", "-?", "-h", "--help", "help":
+		fmt.Println("nigms-cli - nun-ist-genug-mit-schnee command line interface")
+		fmt.Println("command: " + os.Args[1])
 
-        os.Exit(0)
+		os.Exit(0)
 
-    // create a new post
-    case "new", "create":
-        contents, err := ioutil.ReadFile("post.yaml")
+	// create a new post
+	case "new", "create":
+		contents, err := ioutil.ReadFile("post.yaml")
+		//fmt.Println(string(contents))
 
-        if err != nil {
-            fmt.Println(err)
-            os.Exit(1)
-        }
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
-        p := Post{}
-        err = yaml.Unmarshal([]byte(contents), &p)
+		p := Post{}
 
-        fmt.Println(p)
-        //os.Exit(1)
+		err = yaml.Unmarshal(contents, &p)
 
-        requestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/post"
-        values := url.Values{}
+		if err != nil {
+            fmt.Print("Error: ")
+			fmt.Println(err)
+			os.Exit(1)
+		}
 
-        values.Set("type", "text")
-        values.Set("state", "draft") // "draft", "published"
-        values.Set("title", "Kein Schnee in Gilching ...")
-        values.Set("body", "... wieder 4°C, meist bewölkt.")
-        values.Set("tags", "keinschnee,201601,gilching,ingress")
-        values.Set("date", "20160106T20:05:00")
+		fmt.Printf("sending data: %+v\n", p)
+        //os.Exit(0)
 
-        httpContents, err := doApiRequest("POST", requestURL, values)
+		apiRequestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/post"
+		apiValues := p.GetTumblrApiValues()
 
-        if err != nil {
-            fmt.Println("ERROR: can't read http response body")
-            os.Exit(1)
-        }
+		httpContents, err := doApiRequest("POST", apiRequestURL, apiValues)
 
-        fmt.Println(string(httpContents))
-        os.Exit(0)
+		if err != nil {
+			fmt.Println("ERROR: can't read http response body")
+			os.Exit(1)
+		}
 
-    // update existing posting:
-    // nigms-cli update <id> <status> <time>
-    case "update":
-        if len(os.Args) < 3 {
-            fmt.Println("ERROR: please provide a post id to update")
-            os.Exit(1)
-        }
+		fmt.Println(string(httpContents))
+		os.Exit(0)
 
-        if len(os.Args) < 4 {
-            fmt.Println("ERROR: please provide a post status to update")
-            os.Exit(1)
-        }
+	// update existing posting:
+	// nigms-cli update <id> <status> <time>
+	case "update":
+		if len(os.Args) < 3 {
+			fmt.Println("ERROR: please provide a post id to update")
+			os.Exit(1)
+		}
 
-        //requestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/post/edit"
+		if len(os.Args) < 4 {
+			fmt.Println("ERROR: please provide a post status to update")
+			os.Exit(1)
+		}
 
-        os.Exit(0)
+		//requestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/post/edit"
 
-    // delete a post
-    case "delete":
-        if len(os.Args) < 3 {
-            fmt.Println("ERROR: please provide a post id to delete")
-            os.Exit(1)
-        }
+		os.Exit(0)
 
-        requestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/post/delete"
+	// delete a post
+	case "delete":
+		if len(os.Args) < 3 {
+			fmt.Println("ERROR: please provide a post id to delete")
+			os.Exit(1)
+		}
 
-        values := url.Values{}
-        values.Set("id", os.Args[2])
+		requestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/post/delete"
 
-        httpContents, err := doApiRequest("POST", requestURL, values)
+		values := url.Values{}
+		values.Set("id", os.Args[2])
 
-        if err != nil {
-            fmt.Println("ERROR: can't read http response body")
-            os.Exit(1)
-        }
+		httpContents, err := doApiRequest("POST", requestURL, values)
 
-        fmt.Println(string(httpContents))
-        os.Exit(0)
+		if err != nil {
+			fmt.Println("ERROR: can't read http response body")
+			os.Exit(1)
+		}
 
-    // get list of draft posts
-    case "drafts", "posts":
-        requestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/posts"
+		fmt.Println(string(httpContents))
+		os.Exit(0)
 
-        if os.Args[1] == "drafts" {
-            requestURL = requestURL + "/draft"
-        }
+	// get list of draft posts
+	case "drafts", "posts":
+		requestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/posts"
 
-        httpContents, err := doApiRequest("POST", requestURL, url.Values{})
+		if os.Args[1] == "drafts" {
+			requestURL = requestURL + "/draft"
+		}
 
-        if err != nil {
-            fmt.Println("ERROR: can't read http response body")
-            os.Exit(1)
-        }
+		httpContents, err := doApiRequest("POST", requestURL, url.Values{})
 
-        fmt.Println(string(httpContents))
-        os.Exit(0)
+		if err != nil {
+			fmt.Println("ERROR: can't read http response body")
+			os.Exit(1)
+		}
 
-    case "debug":
-        // nothing
-        os.Exit(0)
+		fmt.Println(string(httpContents))
+		os.Exit(0)
 
-    default:
-        fmt.Println("ERROR: unknown command \"" + os.Args[1] + "\"")
-        os.Exit(1)
-    }
+	case "debug":
+		// nothing
+		os.Exit(0)
+
+	default:
+		fmt.Println("ERROR: unknown command \"" + os.Args[1] + "\"")
+		os.Exit(1)
+	}
 }

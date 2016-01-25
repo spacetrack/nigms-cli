@@ -1,7 +1,10 @@
-title: Kein Schnee in Gröbenzell ...
-body:  "... 4°C, meist bewölkt."
+type: ...
+title: Kein Schnee am Leonrodplatz ...
+body:  "... zwar hie und da noch weiße Flecken an Straßenrändern und schattigen Grünflächen, aber insgesamt hat der Regen gestern Abend ganze Arbeit geleistet, die den Schnee hinfortzuwaschen."
 tags:
-	- keinschnee
-	- 201601
-	- gröbenzell
-date: 20160105T20:00:30
+    - keinschnee
+#    - schnee
+    - 201601
+    - münchen
+#    - ingress
+time: 2016-01-25T20:30:00+01:00
