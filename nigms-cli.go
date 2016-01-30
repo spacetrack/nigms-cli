@@ -92,7 +92,13 @@ func main() {
 
 	// create a new post
 	case "new", "create":
-		contents, err := ioutil.ReadFile("post.yaml")
+        fileName := "post.yaml"
+
+        if len(os.Args) > 1 {
+            fileName = os.Args[2]
+        }
+
+		contents, err := ioutil.ReadFile(fileName)
 		//fmt.Println(string(contents))
 
 		if err != nil {
