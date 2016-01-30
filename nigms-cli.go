@@ -189,9 +189,13 @@ func main() {
 		fmt.Println(string(httpContents))
 		os.Exit(0)
 
-	case "debug":
-		// nothing
+	case "version":
+		fmt.Println("Nun ist genug mit Schnee! nigms-cli verson 0.3.0 (2016-01-30)");
 		os.Exit(0)
+
+    case "debug":
+        // nothing
+        os.Exit(0)
 
 	default:
 		fmt.Println("ERROR: unknown command \"" + os.Args[1] + "\"")
