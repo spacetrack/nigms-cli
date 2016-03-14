@@ -92,17 +92,31 @@ func main() {
 
 	// create a new post
 	case "new", "create":
-        fileName := "post.yaml"
+        // the default file to look into: ./post.yaml
+        var f *os.File
+        var err error
+        var fileName = "post.yaml"
 
-        if len(os.Args) > 1 {
+        if len(os.Args) > 2 {
             fileName = os.Args[2]
         }
 
-		contents, err := ioutil.ReadFile(fileName)
+        if fileName == "--" {
+            f = os.Stdin
+        } else {
+            f, err = os.Open(fileName)
+        }
+
+        if err != nil {
+            fmt.Fprintf(os.Stderr, "ERROR 100! %v\n", err)
+            os.Exit(1)
+        }
+
+		contents, err := ioutil.ReadAll(f)
 		//fmt.Println(string(contents))
 
 		if err != nil {
-			fmt.Println(err)
+            fmt.Fprintf(os.Stderr, "ERROR 200! %v\n", err)
 			os.Exit(1)
 		}
 
@@ -111,8 +125,7 @@ func main() {
 		err = yaml.Unmarshal(contents, &p)
 
 		if err != nil {
-            fmt.Print("Error: ")
-			fmt.Println(err)
+            fmt.Fprintf(os.Stderr, "ERROR 300! %v\n", err)
 			os.Exit(1)
 		}
 
@@ -125,7 +138,7 @@ func main() {
 		httpContents, err := doApiRequest("POST", apiRequestURL, apiValues)
 
 		if err != nil {
-			fmt.Println("ERROR: can't read http response body")
+            fmt.Fprintf(os.Stderr, "ERROR! can't read http response body | %v\n", err)
 			os.Exit(1)
 		}
 
@@ -136,12 +149,12 @@ func main() {
 	// nigms-cli update <id> <status> <time>
 	case "update":
 		if len(os.Args) < 3 {
-			fmt.Println("ERROR: please provide a post id to update")
+            fmt.Fprintf(os.Stderr, "ERROR! please provide a post id to update\n")
 			os.Exit(1)
 		}
 
 		if len(os.Args) < 4 {
-			fmt.Println("ERROR: please provide a post status to update")
+            fmt.Fprintf(os.Stderr, "ERROR! please provide a post status to update\n")
 			os.Exit(1)
 		}
 
@@ -152,7 +165,7 @@ func main() {
 	// delete a post
 	case "delete":
 		if len(os.Args) < 3 {
-			fmt.Println("ERROR: please provide a post id to delete")
+            fmt.Fprintf(os.Stderr, "ERROR! please provide a post id to delete\n")
 			os.Exit(1)
 		}
 
@@ -164,7 +177,7 @@ func main() {
 		httpContents, err := doApiRequest("POST", requestURL, values)
 
 		if err != nil {
-			fmt.Println("ERROR: can't read http response body")
+            fmt.Fprintf(os.Stderr, "ERROR! can't read http response body | %v\n", err)
 			os.Exit(1)
 		}
 
@@ -182,7 +195,7 @@ func main() {
 		httpContents, err := doApiRequest("POST", requestURL, url.Values{})
 
 		if err != nil {
-			fmt.Println("ERROR: can't read http response body")
+			fmt.Fprintf(os.Stderr, "ERROR! can't read http response body | %v\n", err)
 			os.Exit(1)
 		}
 
@@ -190,7 +203,7 @@ func main() {
 		os.Exit(0)
 
 	case "version":
-		fmt.Println("Nun ist genug mit Schnee! nigms-cli verson 0.3.0 (2016-01-30)");
+		fmt.Println("Nun ist genug mit Schnee! nigms-cli verson 0.3.1 (2016-03-14)");
 		os.Exit(0)
 
     case "debug":
@@ -198,7 +211,7 @@ func main() {
         os.Exit(0)
 
 	default:
-		fmt.Println("ERROR: unknown command \"" + os.Args[1] + "\"")
+		fmt.Fprintf(os.Stderr, "ERROR! unknown command \"" + os.Args[1] + "\"\n")
 		os.Exit(1)
 	}
 }

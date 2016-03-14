@@ -1,10 +1,8 @@
-type: ...
-title: Kein Schnee am Leonrodplatz ...
-body:  "... zwar hie und da noch weiße Flecken an Straßenrändern und schattigen Grünflächen, aber insgesamt hat der Regen gestern Abend ganze Arbeit geleistet, die den Schnee hinfortzuwaschen."
+﻿type: ...
+title: Kein Schnee in Gröbenzell ...
+body:  "... vereinzelt mal Sonne, am Abend vereinzelt Regen. Kalt!"
 tags:
     - keinschnee
-#    - schnee
-    - 201601
-    - münchen
-#    - ingress
-time: 2016-01-25T20:30:00+01:00
+    - 201603
+    - gröbenzell
+time: 2016-03-12T19:20:00+01:00
