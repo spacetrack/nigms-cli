@@ -92,31 +92,31 @@ func main() {
 
 	// create a new post
 	case "new", "create":
-        // the default file to look into: ./post.yaml
-        var f *os.File
-        var err error
-        var fileName = "post.yaml"
+		// the default file to look into: ./post.yaml
+		var f *os.File
+		var err error
+		var fileName = "post.yaml"
 
-        if len(os.Args) > 2 {
-            fileName = os.Args[2]
-        }
+		if len(os.Args) > 2 {
+			fileName = os.Args[2]
+		}
 
-        if fileName == "--" {
-            f = os.Stdin
-        } else {
-            f, err = os.Open(fileName)
-        }
+		if fileName == "--" {
+			f = os.Stdin
+		} else {
+			f, err = os.Open(fileName)
+		}
 
-        if err != nil {
-            fmt.Fprintf(os.Stderr, "ERROR 100! %v\n", err)
-            os.Exit(1)
-        }
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "ERROR 100! %v\n", err)
+			os.Exit(1)
+		}
 
 		contents, err := ioutil.ReadAll(f)
 		//fmt.Println(string(contents))
 
 		if err != nil {
-            fmt.Fprintf(os.Stderr, "ERROR 200! %v\n", err)
+			fmt.Fprintf(os.Stderr, "ERROR 200! %v\n", err)
 			os.Exit(1)
 		}
 
@@ -125,12 +125,12 @@ func main() {
 		err = yaml.Unmarshal(contents, &p)
 
 		if err != nil {
-            fmt.Fprintf(os.Stderr, "ERROR 300! %v\n", err)
+			fmt.Fprintf(os.Stderr, "ERROR 300! %v\n", err)
 			os.Exit(1)
 		}
 
 		fmt.Printf("sending data: %+v\n", p)
-        //os.Exit(0)
+		//os.Exit(0)
 
 		apiRequestURL := "https://api.tumblr.com/v2/blog/nunistgenugmitschnee.tumblr.com/post"
 		apiValues := p.GetTumblrApiValues()
@@ -138,7 +138,7 @@ func main() {
 		httpContents, err := doApiRequest("POST", apiRequestURL, apiValues)
 
 		if err != nil {
-            fmt.Fprintf(os.Stderr, "ERROR! can't read http response body | %v\n", err)
+			fmt.Fprintf(os.Stderr, "ERROR! can't read http response body | %v\n", err)
 			os.Exit(1)
 		}
 
@@ -149,12 +149,12 @@ func main() {
 	// nigms-cli update <id> <status> <time>
 	case "update":
 		if len(os.Args) < 3 {
-            fmt.Fprintf(os.Stderr, "ERROR! please provide a post id to update\n")
+			fmt.Fprintf(os.Stderr, "ERROR! please provide a post id to update\n")
 			os.Exit(1)
 		}
 
 		if len(os.Args) < 4 {
-            fmt.Fprintf(os.Stderr, "ERROR! please provide a post status to update\n")
+			fmt.Fprintf(os.Stderr, "ERROR! please provide a post status to update\n")
 			os.Exit(1)
 		}
 
@@ -165,7 +165,7 @@ func main() {
 	// delete a post
 	case "delete":
 		if len(os.Args) < 3 {
-            fmt.Fprintf(os.Stderr, "ERROR! please provide a post id to delete\n")
+			fmt.Fprintf(os.Stderr, "ERROR! please provide a post id to delete\n")
 			os.Exit(1)
 		}
 
@@ -177,7 +177,7 @@ func main() {
 		httpContents, err := doApiRequest("POST", requestURL, values)
 
 		if err != nil {
-            fmt.Fprintf(os.Stderr, "ERROR! can't read http response body | %v\n", err)
+			fmt.Fprintf(os.Stderr, "ERROR! can't read http response body | %v\n", err)
 			os.Exit(1)
 		}
 
@@ -203,15 +203,15 @@ func main() {
 		os.Exit(0)
 
 	case "version":
-		fmt.Println("Nun ist genug mit Schnee! nigms-cli verson 0.3.1 (2016-03-14)");
+		fmt.Println("Nun ist genug mit Schnee! nigms-cli verson 0.3.1 (2016-03-14)")
 		os.Exit(0)
 
-    case "debug":
-        // nothing
-        os.Exit(0)
+	case "debug":
+		// nothing
+		os.Exit(0)
 
 	default:
-		fmt.Fprintf(os.Stderr, "ERROR! unknown command \"" + os.Args[1] + "\"\n")
+		fmt.Fprintf(os.Stderr, "ERROR! unknown command \""+os.Args[1]+"\"\n")
 		os.Exit(1)
 	}
 }
