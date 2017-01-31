@@ -102,6 +102,8 @@ func main() {
 		}
 
 		if fileName == "--" {
+			// todo: we can use `fi, err := os.Stdin.Stat()` to find out, if there is someting from stdin
+			// see https://coderwall.com/p/zyxyeg/golang-having-fun-with-os-stdin-and-shell-pipes
 			f = os.Stdin
 		} else {
 			f, err = os.Open(fileName)
